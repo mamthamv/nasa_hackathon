@@ -1,5 +1,6 @@
-Flask==2.1.3
 numpy
 tensorflow  # Replace with the version you are using
 gunicorn==20.1.0  # For production WSGI server
-Werkzeug   # Use a version compatible with Flask and TensorFlow
+Flask==2.2.3
+Werkzeug==2.2.3
+
