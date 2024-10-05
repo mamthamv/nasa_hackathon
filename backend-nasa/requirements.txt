@@ -3,4 +3,4 @@ tensorflow  # Replace with the version you are using
 gunicorn==20.1.0  # For production WSGI server
 Flask==2.2.3
 Werkzeug==2.2.3
-
+joblib
