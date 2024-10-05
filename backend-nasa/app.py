@@ -1,11 +1,24 @@
 from flask import Flask, request, jsonify
 import numpy as np
+import joblib
+import pandas as pd
 import tensorflow as tf
 
 # Load your model (make sure to place your model file in the same directory)
-model = tf.keras.models.load_model('cnn_model.h5')  # Update with your model file name
-
+model = tf.keras.models.load_model('cnn1.h5')  # Update with your model file name
+data = pd.read_csv('combined_europe_data_Test1.csv')
+scaler = joblib.load('scaler.pkl')
 app = Flask(__name__)
+
+def filter_data_by_lat_lon(df, input_lat, input_lon):
+    # Calculate the distance between input lat, lon and dataset lat, lon
+    distances = np.sqrt((df['lat'] - input_lat) * 2 + (df['lon'] - input_lon) * 2)
+    
+    # Find the index of the closest point
+    closest_index = distances.idxmin()
+    
+    # Return the closest row of data
+    return df.iloc[closest_index]
 
 def predict_conditions(input_lat, input_lon):
     relevant_columns= [
@@ -45,10 +58,10 @@ def predict_conditions(input_lat, input_lon):
     crop_health_status = "Healthy" if crop_health == 1 else ("At Risk" if crop_health == -1 else "Average")
 
     # 4. Frost Risk Status based on Frost Risk Indicator (FRI)
-    frost_risk_status = f"Frost risk: {'High' if frost_risk == 1 else 'Low'}"
+    frost_risk_status = f"{'High' if frost_risk == 1 else 'Low'}"
 
     # 5. Yield Quality Status based on Yield Quality Index (YQI)
-    yield_quality_status = f"Yield quality: {yield_quality * 100:.2f}%"
+    yield_quality_status = f"{yield_quality * 100:.2f}%"
     
     
     
@@ -70,10 +83,6 @@ def predict():
     
     prediction=predict_conditions(lat, lon)
 
-
-
-    # Return the prediction
-    return jsonify({'prediction': prediction.tolist()})
-
+    return jsonify({'prediction': prediction})
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
