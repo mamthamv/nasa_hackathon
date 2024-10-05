@@ -1,0 +1,2 @@
+runtime: python39  # or python38
+entrypoint: gunicorn -b :$PORT main:app  # Change 'main' to the name of your main application file
